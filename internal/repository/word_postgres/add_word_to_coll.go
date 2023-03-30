@@ -9,7 +9,7 @@ import (
 )
 
 func (p *Postgres) AddWordToCollection(ctx context.Context,
-	collection *entity.Collection) error {
+	collection entity.Collection) error {
 	sql, args, err := p.Builder.Insert("user_collection").
 		Columns("user_id, word, collection_name, time_diff, last_repeat").
 		Values(

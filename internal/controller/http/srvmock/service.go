@@ -15,11 +15,11 @@ type Service struct {
 }
 
 // AddWord provides a mock function with given fields: ctx, collection
-func (_m *Service) AddWord(ctx context.Context, collection *entity.Collection) error {
+func (_m *Service) AddWord(ctx context.Context, collection entity.Collection) error {
 	ret := _m.Called(ctx, collection)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entity.Collection) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Collection) error); ok {
 		r0 = rf(ctx, collection)
 	} else {
 		r0 = ret.Error(0)
@@ -29,11 +29,11 @@ func (_m *Service) AddWord(ctx context.Context, collection *entity.Collection) e
 }
 
 // DeleteWordFromCollection provides a mock function with given fields: ctx, collection
-func (_m *Service) DeleteWordFromCollection(ctx context.Context, collection *entity.Collection) error {
+func (_m *Service) DeleteWordFromCollection(ctx context.Context, collection entity.Collection) error {
 	ret := _m.Called(ctx, collection)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entity.Collection) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Collection) error); ok {
 		r0 = rf(ctx, collection)
 	} else {
 		r0 = ret.Error(0)
@@ -43,15 +43,15 @@ func (_m *Service) DeleteWordFromCollection(ctx context.Context, collection *ent
 }
 
 // GetUserWords provides a mock function with given fields: ctx, collection
-func (_m *Service) GetUserWords(ctx context.Context, collection *entity.Collection) (*entity.UserWords, error) {
+func (_m *Service) GetUserWords(ctx context.Context, collection entity.Collection) (*entity.UserWords, error) {
 	ret := _m.Called(ctx, collection)
 
 	var r0 *entity.UserWords
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entity.Collection) (*entity.UserWords, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Collection) (*entity.UserWords, error)); ok {
 		return rf(ctx, collection)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *entity.Collection) *entity.UserWords); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Collection) *entity.UserWords); ok {
 		r0 = rf(ctx, collection)
 	} else {
 		if ret.Get(0) != nil {
@@ -59,7 +59,7 @@ func (_m *Service) GetUserWords(ctx context.Context, collection *entity.Collecti
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *entity.Collection) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, entity.Collection) error); ok {
 		r1 = rf(ctx, collection)
 	} else {
 		r1 = ret.Error(1)
@@ -69,11 +69,11 @@ func (_m *Service) GetUserWords(ctx context.Context, collection *entity.Collecti
 }
 
 // UpdateLearnInterval provides a mock function with given fields: ctx, collection
-func (_m *Service) UpdateLearnInterval(ctx context.Context, collection *entity.Collection) error {
+func (_m *Service) UpdateLearnInterval(ctx context.Context, collection entity.Collection) error {
 	ret := _m.Called(ctx, collection)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entity.Collection) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Collection) error); ok {
 		r0 = rf(ctx, collection)
 	} else {
 		r0 = ret.Error(0)

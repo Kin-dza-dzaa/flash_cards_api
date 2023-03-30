@@ -12,7 +12,7 @@ type GetUserWords_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    *entity.UserWords
 		WantErr bool
 	}
@@ -22,13 +22,13 @@ type GetUserWords_Suite struct {
 func (s *GetUserWords_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    *entity.UserWords
 		WantErr bool
 	}{
 		{
 			Name: "Get from empty coll",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Name:   "test_coll",
 				Word:   "test_word",
 				UserID: "12345",

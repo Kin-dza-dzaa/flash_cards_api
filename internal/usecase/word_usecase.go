@@ -10,17 +10,17 @@ import (
 
 type (
 	database interface {
-		IsWordInCollection(ctx context.Context, collection *entity.Collection) (bool, error)
-		IsTransInDB(ctx context.Context, collection *entity.Collection) (bool, error)
-		AddTranslation(ctx context.Context, wordTrans *entity.WordTrans) error
-		AddWordToCollection(ctx context.Context, collection *entity.Collection) error
-		UpdateLearnInterval(ctx context.Context, collection *entity.Collection) error
-		DeleteWordFromCollection(ctx context.Context, collection *entity.Collection) error
-		GetUserWords(ctx context.Context, collection *entity.Collection) (*entity.UserWords, error)
+		IsWordInCollection(ctx context.Context, collection entity.Collection) (bool, error)
+		IsTransInDB(ctx context.Context, collection entity.Collection) (bool, error)
+		AddTranslation(ctx context.Context, wordTrans entity.WordTrans) error
+		AddWordToCollection(ctx context.Context, collection entity.Collection) error
+		UpdateLearnInterval(ctx context.Context, collection entity.Collection) error
+		DeleteWordFromCollection(ctx context.Context, collection entity.Collection) error
+		GetUserWords(ctx context.Context, collection entity.Collection) (*entity.UserWords, error)
 	}
 
 	tranlsator interface {
-		Translate(word string) (*entity.WordTrans, error)
+		Translate(word string) (entity.WordTrans, error)
 	}
 )
 
@@ -30,7 +30,7 @@ type WordService struct {
 }
 
 func (s *WordService) DeleteWordFromCollection(ctx context.Context,
-	collection *entity.Collection) error {
+	collection entity.Collection) error {
 	err := s.dbAdapter.DeleteWordFromCollection(ctx, collection)
 	if err != nil {
 		return fmt.Errorf("WordService - DeleteWordFromCollection - "+
@@ -40,7 +40,7 @@ func (s *WordService) DeleteWordFromCollection(ctx context.Context,
 }
 
 func (s *WordService) UpdateLearnInterval(ctx context.Context,
-	collection *entity.Collection) error {
+	collection entity.Collection) error {
 	err := s.dbAdapter.UpdateLearnInterval(ctx, collection)
 	if err != nil {
 		return fmt.Errorf("WordService - UpdateLearnInterval - "+
@@ -50,7 +50,7 @@ func (s *WordService) UpdateLearnInterval(ctx context.Context,
 }
 
 func (s *WordService) GetUserWords(ctx context.Context,
-	collection *entity.Collection) (*entity.UserWords, error) {
+	collection entity.Collection) (*entity.UserWords, error) {
 	userWords, err := s.dbAdapter.GetUserWords(ctx, collection)
 	if err != nil {
 		return nil, fmt.Errorf("WordService - GetUserWords - s.dbAdapter.GetUserWords: %w", err)
@@ -58,7 +58,7 @@ func (s *WordService) GetUserWords(ctx context.Context,
 	return userWords, nil
 }
 
-func (s *WordService) AddWord(ctx context.Context, collection *entity.Collection) error {
+func (s *WordService) AddWord(ctx context.Context, collection entity.Collection) error {
 	inCol, err := s.dbAdapter.IsWordInCollection(ctx, collection)
 	if err != nil {
 		return fmt.Errorf("WordService - AddWord - s.dbAdapter.IsWordInCollection: %w", err)

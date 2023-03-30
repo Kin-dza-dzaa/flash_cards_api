@@ -13,19 +13,19 @@ type Tranlsator struct {
 }
 
 // Translate provides a mock function with given fields: word
-func (_m *Tranlsator) Translate(word string) (*entity.WordTrans, error) {
+func (_m *Tranlsator) Translate(word string) (entity.WordTrans, error) {
 	ret := _m.Called(word)
 
-	var r0 *entity.WordTrans
+	var r0 entity.WordTrans
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*entity.WordTrans, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (entity.WordTrans, error)); ok {
 		return rf(word)
 	}
-	if rf, ok := ret.Get(0).(func(string) *entity.WordTrans); ok {
+	if rf, ok := ret.Get(0).(func(string) entity.WordTrans); ok {
 		r0 = rf(word)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entity.WordTrans)
+			r0 = ret.Get(0).(entity.WordTrans)
 		}
 	}
 

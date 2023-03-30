@@ -12,7 +12,7 @@ type UpdateLearnInterval_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		WantErr bool
 	}
 }
@@ -21,12 +21,12 @@ type UpdateLearnInterval_Suite struct {
 func (s *UpdateLearnInterval_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		WantErr bool
 	}{
 		{
 			Name: "Update word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Name:   "test_coll",
 				Word:   "test_word",
 				UserID: "12345",

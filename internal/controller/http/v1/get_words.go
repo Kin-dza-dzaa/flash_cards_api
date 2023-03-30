@@ -19,7 +19,7 @@ func (h *wordHandler) getWords(w http.ResponseWriter, r *http.Request) {
 			})
 		return
 	}
-	collection := &entity.Collection{
+	collection := entity.Collection{
 		UserID: userID,
 	}
 

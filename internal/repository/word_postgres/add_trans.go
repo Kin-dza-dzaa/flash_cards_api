@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-func (p *Postgres) AddTranslation(ctx context.Context, wordTrans *entity.WordTrans) error {
+func (p *Postgres) AddTranslation(ctx context.Context, wordTrans entity.WordTrans) error {
 	sql, args, err := p.Builder.
 		Insert("word_translation").Columns("word, trans_data").
 		Values(wordTrans.Word, wordTrans).

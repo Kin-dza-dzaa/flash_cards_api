@@ -12,7 +12,7 @@ type IsWordInColl_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    bool
 		WantErr bool
 	}
@@ -22,19 +22,19 @@ type IsWordInColl_Suite struct {
 func (s *IsWordInColl_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    bool
 		WantErr bool
 	}{
 		{
 			Name:    "Not existing word",
-			Coll:    &entity.Collection{},
+			Coll:    entity.Collection{},
 			Want:    false,
 			WantErr: false,
 		},
 		{
 			Name: "Existing word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				Name:   "test_coll",
 				UserID: "12345",
@@ -47,7 +47,7 @@ func (s *IsWordInColl_Suite) SetupTest() {
 	for _, tc := range s.tcs {
 		if tc.Want {
 			if err := s.pg.AddTranslation(s.ctx,
-				&entity.WordTrans{Word: tc.Coll.Word}); err != nil {
+				entity.WordTrans{Word: tc.Coll.Word}); err != nil {
 				s.FailNow(err.Error())
 			}
 			if err := s.pg.AddWordToCollection(s.ctx, tc.Coll); err != nil {

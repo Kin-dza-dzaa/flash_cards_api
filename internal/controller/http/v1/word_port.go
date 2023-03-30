@@ -21,10 +21,10 @@ const (
 
 type (
 	service interface {
-		AddWord(ctx context.Context, collection *entity.Collection) error
-		DeleteWordFromCollection(ctx context.Context, collection *entity.Collection) error
-		GetUserWords(ctx context.Context, collection *entity.Collection) (*entity.UserWords, error)
-		UpdateLearnInterval(ctx context.Context, collection *entity.Collection) error
+		AddWord(ctx context.Context, collection entity.Collection) error
+		DeleteWordFromCollection(ctx context.Context, collection entity.Collection) error
+		GetUserWords(ctx context.Context, collection entity.Collection) (*entity.UserWords, error)
+		UpdateLearnInterval(ctx context.Context, collection entity.Collection) error
 	}
 
 	wordHandler struct {

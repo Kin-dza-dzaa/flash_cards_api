@@ -33,13 +33,13 @@ func (s *WordUseCaseTestSuite) SetupSuite() {
 func (s *WordUseCaseTestSuite) TestAddWord() {
 	testCases := []struct {
 		Name      string
-		Coll      *entity.Collection
+		Coll      entity.Collection
 		SetUpMock func()
 		ExpectErr bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",
@@ -48,7 +48,7 @@ func (s *WordUseCaseTestSuite) TestAddWord() {
 				s.dbMock.On("IsWordInCollection", s.ctx, mock.Anything).Once().Return(false, nil)
 				s.dbMock.On("IsTransInDB", s.ctx, mock.Anything).Once().Return(false, nil)
 				s.trMock.On("Translate", mock.Anything).Once().
-					Return(new(entity.WordTrans), nil)
+					Return(entity.WordTrans{}, nil)
 				s.dbMock.On("AddTranslation", s.ctx, mock.Anything).Once().
 					Return(nil)
 				s.dbMock.On("AddWordToCollection", s.ctx, mock.Anything).Once().Return(nil)
@@ -57,7 +57,7 @@ func (s *WordUseCaseTestSuite) TestAddWord() {
 		},
 		{
 			Name: "Add existing word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",
@@ -69,7 +69,7 @@ func (s *WordUseCaseTestSuite) TestAddWord() {
 		},
 		{
 			Name: "Add new word but in DB",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",
@@ -99,14 +99,14 @@ func (s *WordUseCaseTestSuite) TestAddWord() {
 func (s *WordUseCaseTestSuite) TestGetUserWords() {
 	testCases := []struct {
 		Name      string
-		Coll      *entity.Collection
+		Coll      entity.Collection
 		SetUpMock func()
 		ExpectErr bool
 		Res       *entity.UserWords
 	}{
 		{
 			Name: "Add new word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",
@@ -137,13 +137,13 @@ func (s *WordUseCaseTestSuite) TestGetUserWords() {
 func (s *WordUseCaseTestSuite) TestUpdateLearnInterval() {
 	testCases := []struct {
 		Name      string
-		Coll      *entity.Collection
+		Coll      entity.Collection
 		SetUpMock func()
 		ExpectErr bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",
@@ -172,13 +172,13 @@ func (s *WordUseCaseTestSuite) TestUpdateLearnInterval() {
 func (s *WordUseCaseTestSuite) TestDeleteWordFromCollection() {
 	testCases := []struct {
 		Name      string
-		Coll      *entity.Collection
+		Coll      entity.Collection
 		SetUpMock func()
 		ExpectErr bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Word:   "some_word",
 				UserID: "12345",
 				Name:   "some_coll",

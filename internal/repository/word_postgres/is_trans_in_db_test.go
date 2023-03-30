@@ -12,7 +12,7 @@ type IsTransInDB_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    bool
 		WantErr bool
 	}
@@ -22,13 +22,13 @@ type IsTransInDB_Suite struct {
 func (s *IsTransInDB_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		Want    bool
 		WantErr bool
 	}{
 		{
 			Name: "Not existing trans",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Name:   "test_coll",
 				Word:   "not_exist_word",
 				UserID: "12345",
@@ -38,7 +38,7 @@ func (s *IsTransInDB_Suite) SetupTest() {
 		},
 		{
 			Name: "Existing trans",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Name:   "test_coll",
 				Word:   "test_word",
 				UserID: "12345",
@@ -51,7 +51,7 @@ func (s *IsTransInDB_Suite) SetupTest() {
 	for _, tc := range s.tcs {
 		if tc.Want {
 			if err := s.pg.AddTranslation(s.ctx,
-				&entity.WordTrans{Word: tc.Coll.Word}); err != nil {
+				entity.WordTrans{Word: tc.Coll.Word}); err != nil {
 				s.FailNow(err.Error())
 			}
 		}

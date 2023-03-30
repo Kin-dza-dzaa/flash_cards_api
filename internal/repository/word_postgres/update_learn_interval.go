@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-func (p *Postgres) UpdateLearnInterval(ctx context.Context, collection *entity.Collection) error {
+func (p *Postgres) UpdateLearnInterval(ctx context.Context, collection entity.Collection) error {
 	sql, args, err := p.Builder.Update("user_collection").
 		Set("time_diff", collection.TimeDiff).
 		Set("last_repeat", collection.LastRepeat).

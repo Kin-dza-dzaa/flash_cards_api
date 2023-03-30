@@ -10,7 +10,7 @@ import (
 
 func (s *wordHandler_Suite) Test_wordHandler_decodeCollection() {
 	tests := []struct {
-		Want    *entity.Collection
+		Want    entity.Collection
 		Req     *http.Request
 		Name    string
 		WantErr bool
@@ -29,7 +29,7 @@ func (s *wordHandler_Suite) Test_wordHandler_decodeCollection() {
 					),
 				)),
 			WantErr: false,
-			Want: &entity.Collection{
+			Want: entity.Collection{
 				Word: "some_word",
 				Name: "some_coll",
 			},
@@ -48,7 +48,7 @@ func (s *wordHandler_Suite) Test_wordHandler_decodeCollection() {
 					),
 				)),
 			WantErr: true,
-			Want:    nil,
+			Want:    entity.Collection{},
 		},
 	}
 	for _, tc := range tests {

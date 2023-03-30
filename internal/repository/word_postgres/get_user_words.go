@@ -9,7 +9,7 @@ import (
 )
 
 func (p *Postgres) GetUserWords(ctx context.Context,
-	collection *entity.Collection) (*entity.UserWords, error) {
+	collection entity.Collection) (*entity.UserWords, error) {
 	sql, args, err := p.Builder.Select("collection_name, time_diff, last_repeat, trans_data").
 		From("user_collection").
 		Join("word_translation USING(word)").

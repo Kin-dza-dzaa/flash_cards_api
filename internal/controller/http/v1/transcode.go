@@ -20,10 +20,10 @@ type httpResponse struct {
 }
 
 // Parses json, if error happens method will return it.
-func (h *wordHandler) decodeCollection(r *http.Request) (*entity.Collection, error) {
-	collection := new(entity.Collection)
+func (h *wordHandler) decodeCollection(r *http.Request) (entity.Collection, error) {
+	var collection entity.Collection
 	if err := json.NewDecoder(r.Body).Decode(&collection); err != nil {
-		return nil, err
+		return collection, err
 	}
 	return collection, nil
 }

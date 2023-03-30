@@ -12,7 +12,7 @@ type DeleteWordFromColl_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		WantErr bool
 	}
 }
@@ -21,12 +21,12 @@ type DeleteWordFromColl_Suite struct {
 func (s *DeleteWordFromColl_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name    string
-		Coll    *entity.Collection
+		Coll    entity.Collection
 		WantErr bool
 	}{
 		{
 			Name: "Delete word",
-			Coll: &entity.Collection{
+			Coll: entity.Collection{
 				Name:   "test_coll",
 				Word:   "test_word",
 				UserID: "12345",
@@ -35,7 +35,7 @@ func (s *DeleteWordFromColl_Suite) SetupTest() {
 		},
 		{
 			Name:    "Delete not existing word",
-			Coll:    &entity.Collection{},
+			Coll:    entity.Collection{},
 			WantErr: false,
 		},
 	}

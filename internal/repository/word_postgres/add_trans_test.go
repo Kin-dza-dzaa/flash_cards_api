@@ -12,7 +12,7 @@ type AddTrans_Suite struct {
 	PostgresBase_Suite
 	tcs []struct {
 		Name      string
-		WordTrans *entity.WordTrans
+		WordTrans entity.WordTrans
 		WantErr   bool
 	}
 }
@@ -21,19 +21,19 @@ type AddTrans_Suite struct {
 func (s *AddTrans_Suite) SetupTest() {
 	s.tcs = []struct {
 		Name      string
-		WordTrans *entity.WordTrans
+		WordTrans entity.WordTrans
 		WantErr   bool
 	}{
 		{
 			Name: "Add normal word",
-			WordTrans: &entity.WordTrans{
+			WordTrans: entity.WordTrans{
 				Word: "test_word",
 			},
 			WantErr: false,
 		},
 		{
 			Name:      "Add empty word",
-			WordTrans: &entity.WordTrans{},
+			WordTrans: entity.WordTrans{},
 			WantErr:   true,
 		},
 	}

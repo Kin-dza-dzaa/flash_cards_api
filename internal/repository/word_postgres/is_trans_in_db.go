@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-func (p *Postgres) IsTransInDB(ctx context.Context, collection *entity.Collection) (bool, error) {
+func (p *Postgres) IsTransInDB(ctx context.Context, collection entity.Collection) (bool, error) {
 	subQuery := p.Builder.
 		Select("*").
 		From("word_translation").

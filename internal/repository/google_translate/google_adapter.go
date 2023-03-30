@@ -16,14 +16,14 @@ type GoogleTranslate struct {
 	defaultTrgtLang string
 }
 
-func (t *GoogleTranslate) Translate(word string) (*entity.WordTrans, error) {
+func (t *GoogleTranslate) Translate(word string) (entity.WordTrans, error) {
 	response, err := t.client.Translate(word, t.defaultSrcLang, t.defaultTrgtLang)
 	if err != nil {
-		return nil, fmt.Errorf("GoogleTranslate - Translate - client.Translate: %w", err)
+		return entity.WordTrans{}, fmt.Errorf("GoogleTranslate - Translate - client.Translate: %w", err)
 	}
 	wordTrans := t.unmarshal(response)
 	if len(wordTrans.Translations) == 0 {
-		return nil, entity.ErrWordNotSupported
+		return entity.WordTrans{}, entity.ErrWordNotSupported
 	}
 
 	return wordTrans, nil
@@ -149,9 +149,9 @@ func (t *GoogleTranslate) getTranslations(
 	return trans
 }
 
-func (t *GoogleTranslate) unmarshal(data []byte) *entity.WordTrans {
+func (t *GoogleTranslate) unmarshal(data []byte) entity.WordTrans {
 	wordTransJRes := t.getTrans(data)
-	wordTrans := new(entity.WordTrans)
+	var wordTrans entity.WordTrans
 
 	wordTrans.Translations = t.getTranslations(wordTransJRes)
 	wordTrans.Word = t.getWord(wordTransJRes)
