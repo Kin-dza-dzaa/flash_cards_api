@@ -10,9 +10,9 @@ import (
 )
 
 type ConnPool struct {
-		Pool    *pgxpool.Pool
-		Builder sq.StatementBuilderType
-	}
+	Pool    *pgxpool.Pool
+	Builder sq.StatementBuilderType
+}
 
 func (p *ConnPool) Close() {
 	p.Pool.Close()

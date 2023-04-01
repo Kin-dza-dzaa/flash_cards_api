@@ -11,4 +11,4 @@ build:
 	go build -o bin/ cmd/app/main.go
 
 run:
-	go run cmd/app/main.go
+	go run cmd/app/main.go 2> logs.log
