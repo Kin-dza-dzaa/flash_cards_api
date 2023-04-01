@@ -15,12 +15,9 @@ type WordService_Suite struct {
 	ws           *WordService
 	wordRepoMock *wordrepomock.WordRepository
 	trMock       *wordrepomock.Translator
-	ctx          context.Context
 }
 
 func (s *WordService_Suite) SetupSuite() {
-	s.ctx = context.Background()
-
 	db := wordrepomock.NewWordPostgres(s.T())
 	tr := wordrepomock.NewTranslator(s.T())
 
@@ -31,63 +28,78 @@ func (s *WordService_Suite) SetupSuite() {
 }
 
 func (s *WordService_Suite) Test_AddWord() {
+	ctx := context.Background()
+
+	type args struct {
+		ctx  context.Context
+		Coll entity.Collection
+	}
+
 	testCases := []struct {
 		Name      string
-		Coll      entity.Collection
-		SetUpMock func()
-		ExpectErr bool
+		Args      args
+		SetUpMock func(args args)
+		WantErr   bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Name: "some_name",
+					Word: "Some_words",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("IsWordInCollection", s.ctx, mock.Anything).Once().Return(false, nil)
-				s.wordRepoMock.On("IsTransInDB", s.ctx, mock.Anything).Once().Return(false, nil)
-				s.trMock.On("Translate", mock.Anything).Once().
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("IsWordInCollection", args.ctx, args.Coll).Once().Return(false, nil)
+				s.wordRepoMock.On("IsTransInDB", args.ctx, args.Coll).Once().Return(false, nil)
+				s.trMock.On("Translate", args.Coll.Word).Once().
 					Return(entity.WordTrans{}, nil)
-				s.wordRepoMock.On("AddTranslation", s.ctx, mock.Anything).Once().
+				s.wordRepoMock.On("AddTranslation", args.ctx, mock.Anything).Once().
 					Return(nil)
-				s.wordRepoMock.On("AddWord", s.ctx, mock.Anything).Once().Return(nil)
+				s.wordRepoMock.On("AddWord", args.ctx, args.Coll).Once().Return(nil)
 			},
-			ExpectErr: false,
+			WantErr: false,
 		},
 		{
 			Name: "Add existing word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Name:   "some_name",
+					UserID: "12345",
+					Word:   "Some_words",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("IsWordInCollection", s.ctx, mock.Anything).Once().Return(true, nil)
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("IsWordInCollection", args.ctx, args.Coll).Once().Return(true, nil)
 			},
-			ExpectErr: false,
+			WantErr: false,
 		},
 		{
 			Name: "Add new word but in DB",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Name:   "some_name",
+					UserID: "12345",
+					Word:   "Some_words",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("IsWordInCollection", s.ctx, mock.Anything).Once().Return(false, nil)
-				s.wordRepoMock.On("IsTransInDB", s.ctx, mock.Anything).Once().Return(true, nil)
-				s.wordRepoMock.On("AddWord", s.ctx, mock.Anything).Once().Return(nil)
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("IsWordInCollection", args.ctx, args.Coll).Once().Return(false, nil)
+				s.wordRepoMock.On("IsTransInDB", args.ctx, args.Coll).Once().Return(true, nil)
+				s.wordRepoMock.On("AddWord", args.ctx, args.Coll).Once().Return(nil)
 			},
-			ExpectErr: false,
+			WantErr: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.Name, func() {
-			tc.SetUpMock()
-			err := s.ws.AddWord(s.ctx, tc.Coll)
-			if tc.ExpectErr {
+			tc.SetUpMock(tc.Args)
+			err := s.ws.AddWord(tc.Args.ctx, tc.Args.Coll)
+			if tc.WantErr {
 				s.Assert().Error(err, "Err must be not nil")
 			} else {
 				s.Assert().Nil(err, "Err must be nil")
@@ -97,34 +109,43 @@ func (s *WordService_Suite) Test_AddWord() {
 }
 
 func (s *WordService_Suite) Test_UserWords() {
+	ctx := context.Background()
+
+	type args struct {
+		ctx  context.Context
+		Coll entity.Collection
+	}
 	testCases := []struct {
 		Name      string
-		Coll      entity.Collection
-		SetUpMock func()
-		ExpectErr bool
+		Args      args
+		SetUpMock func(args args)
+		WantErr   bool
 		Res       *entity.UserWords
 	}{
 		{
 			Name: "Add new word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Name:   "some_name",
+					UserID: "12345",
+					Word:   "Some_words",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("UserWords", s.ctx, mock.Anything).Once().
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("UserWords", args.ctx, args.Coll).Once().
 					Return(new(entity.UserWords), nil)
 			},
-			ExpectErr: false,
-			Res:       new(entity.UserWords),
+			WantErr: false,
+			Res:     new(entity.UserWords),
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.Name, func() {
-			tc.SetUpMock()
-			userWords, err := s.ws.UserWords(s.ctx, tc.Coll)
-			if tc.ExpectErr {
+			tc.SetUpMock(tc.Args)
+			userWords, err := s.ws.UserWords(tc.Args.ctx, tc.Args.Coll)
+			if tc.WantErr {
 				s.Assert().Error(err, "Err must be not nil")
 			} else {
 				s.Assert().Nil(err, "Err must be nil")
@@ -135,32 +156,41 @@ func (s *WordService_Suite) Test_UserWords() {
 }
 
 func (s *WordService_Suite) Test_UpdateLearnInterval() {
+	ctx := context.Background()
+
+	type args struct {
+		ctx  context.Context
+		Coll entity.Collection
+	}
 	testCases := []struct {
 		Name      string
-		Coll      entity.Collection
-		SetUpMock func()
-		ExpectErr bool
+		Args      args
+		SetUpMock func(args args)
+		WantErr   bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Word:   "some_word",
+					UserID: "12345",
+					Name:   "some_coll",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("UpdateLearnInterval", s.ctx, mock.Anything).Once().
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("UpdateLearnInterval", args.ctx, args.Coll).Once().
 					Return(nil)
 			},
-			ExpectErr: false,
+			WantErr: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.Name, func() {
-			tc.SetUpMock()
-			err := s.ws.UpdateLearnInterval(s.ctx, tc.Coll)
-			if tc.ExpectErr {
+			tc.SetUpMock(tc.Args)
+			err := s.ws.UpdateLearnInterval(tc.Args.ctx, tc.Args.Coll)
+			if tc.WantErr {
 				s.Assert().Error(err, "Err must be not nil")
 			} else {
 				s.Assert().Nil(err, "Err must be nil")
@@ -170,21 +200,30 @@ func (s *WordService_Suite) Test_UpdateLearnInterval() {
 }
 
 func (s *WordService_Suite) Test_DeleteWord() {
+	ctx := context.Background()
+
+	type args struct {
+		ctx  context.Context
+		Coll entity.Collection
+	}
 	testCases := []struct {
 		Name      string
-		Coll      entity.Collection
-		SetUpMock func()
+		Args      args
+		SetUpMock func(args args)
 		ExpectErr bool
 	}{
 		{
 			Name: "Add new word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				UserID: "12345",
-				Name:   "some_coll",
+			Args: args{
+				ctx: ctx,
+				Coll: entity.Collection{
+					Word:   "some_word",
+					UserID: "12345",
+					Name:   "some_coll",
+				},
 			},
-			SetUpMock: func() {
-				s.wordRepoMock.On("DeleteWord", s.ctx, mock.Anything).Once().
+			SetUpMock: func(args args) {
+				s.wordRepoMock.On("DeleteWord", args.ctx, args.Coll).Once().
 					Return(nil)
 			},
 			ExpectErr: false,
@@ -193,8 +232,8 @@ func (s *WordService_Suite) Test_DeleteWord() {
 
 	for _, tc := range testCases {
 		s.Run(tc.Name, func() {
-			tc.SetUpMock()
-			err := s.ws.DeleteWord(s.ctx, tc.Coll)
+			tc.SetUpMock(tc.Args)
+			err := s.ws.DeleteWord(tc.Args.ctx, tc.Args.Coll)
 			if tc.ExpectErr {
 				s.Assert().Error(err, "Err must be not nil")
 			} else {
