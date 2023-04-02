@@ -1,60 +1,55 @@
 package wordrepository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
-	"github.com/stretchr/testify/suite"
+	"github.com/google/go-cmp/cmp"
 )
 
-// Sute for testing GetUserWords method, embeds PostgresTestBase suite.
-type UserWords_Suite struct {
-	WordRepository_Base_Suite
-	tcs []struct {
-		Name    string
-		Coll    entity.Collection
-		Want    *entity.UserWords
-		WantErr bool
-	}
-}
+func Test_UserWords(t *testing.T) {
+	ctx := context.Background()
+	wordRepo := setupWordRepoContainer(ctx, t)
 
-// Sets test case data.
-func (s *UserWords_Suite) SetupTest() {
-	s.tcs = []struct {
-		Name    string
-		Coll    entity.Collection
-		Want    *entity.UserWords
-		WantErr bool
+	type args struct {
+		coll entity.Collection
+		ctx  context.Context
+	}
+	tests := []struct {
+		name          string
+		wantUserWords *entity.UserWords
+		wantErr       bool
+		args          args
 	}{
 		{
-			Name: "Get from empty coll",
-			Coll: entity.Collection{
-				Name:   "test_coll",
-				Word:   "test_word",
-				UserID: "12345",
+			name: "Empty collection",
+			args: args{
+				coll: entity.Collection{
+					Name:   "test_coll",
+					Word:   "test_word",
+					UserID: "12345",
+				},
+				ctx: ctx,
 			},
-			Want: &entity.UserWords{
+			wantUserWords: &entity.UserWords{
 				Words: make(map[entity.CollectionName][]entity.WordData, 0),
 			},
-			WantErr: false,
 		},
 	}
-}
 
-func (s *UserWords_Suite) Test_UserWords() {
-	for _, tc := range s.tcs {
-		s.Run(tc.Name, func() {
-			actualRes, err := s.pg.UserWords(s.ctx, tc.Coll)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nil")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotUserWords, err := wordRepo.UserWords(tt.args.ctx, tt.args.coll)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
 			}
-			s.Assert().Equal(tc.Want, actualRes, "User words must be as expected")
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
+			}
+			if diff := cmp.Diff(gotUserWords, tt.wantUserWords); diff != "" {
+				t.Fatalf("user words must be equal diff: %v", diff)
+			}
 		})
 	}
-}
-
-func Test_GetUserWords_Suite(t *testing.T) {
-	suite.Run(t, new(UserWords_Suite))
 }

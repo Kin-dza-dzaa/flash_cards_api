@@ -20,6 +20,8 @@ type (
 		AllowedOrigins  []string      `env:"HTTP_ALLOWED_ORIGINS" env-separator:" " env-default:"http://localhost http://localhost:3000"`
 		AllowedHeaders  []string      `env:"HTTP_ALLOWED_HEADERS" env-separator:" " env-default:"Content-Type Authorization"`
 		ShutdownTimeout time.Duration `env:"HTTP_SHUT_DOWN_TIMEOUT" env-default:"10s"`
+		// In seconds
+		DefaultCorsDuration uint `env:"HTTP_DEFAULT_CORS_DURATION" env-default:"5"`
 	}
 
 	Postgres struct {

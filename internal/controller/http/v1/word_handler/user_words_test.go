@@ -1,37 +1,46 @@
 package wordhadnler
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/mock"
 )
 
-func (s *wordHandler_Suite) Test_wordHandler_userWords() {
+func Test_userWords(t *testing.T) {
+	h, srvMock := setupWordHandler(t)
+
 	type args struct {
 		w *httptest.ResponseRecorder
 		r *http.Request
 	}
 	tests := []struct {
-		Name      string
-		Args      args
-		Want      string
-		setupMock func()
+		name      string
+		args      args
+		wantRes   httpResponse
+		setupMock func(args args)
 	}{
 		{
-			Name: "Without user_id in ctx error",
-			Args: args{
+			name: "Without user_id in ctx",
+			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(http.MethodGet, "/getWords", nil),
 			},
-			Want:      `{"message":"Unauthorized", "path":"/getWords", "status":401}`,
-			setupMock: func() {},
+			wantRes: httpResponse{
+				Path:    "/getWords",
+				Status:  http.StatusUnauthorized,
+				Message: http.StatusText(http.StatusUnauthorized),
+			},
+			setupMock: func(args args) {},
 		},
 		{
-			Name: "Internal error",
-			Args: args{
+			name: "Internal error",
+			args: args{
 				w: httptest.NewRecorder(),
 				r: func() *http.Request {
 					r := httptest.NewRequest(http.MethodGet, "/getWords", nil)
@@ -39,16 +48,20 @@ func (s *wordHandler_Suite) Test_wordHandler_userWords() {
 					return r.WithContext(ctx)
 				}(),
 			},
-			Want: `{"message":"Internal Server Error", "path":"/getWords", "status":500}`,
-			setupMock: func() {
-				s.srv.On("UserWords", mock.Anything, mock.Anything).Once().Return(
+			wantRes: httpResponse{
+				Path:    "/getWords",
+				Status:  http.StatusInternalServerError,
+				Message: http.StatusText(http.StatusInternalServerError),
+			},
+			setupMock: func(args args) {
+				srvMock.On("UserWords", args.r.Context(), mock.Anything).Once().Return(
 					nil, errors.New("some internal error"),
 				)
 			},
 		},
 		{
-			Name: "Valid request",
-			Args: args{
+			name: "Valid request",
+			args: args{
 				w: httptest.NewRecorder(),
 				r: func() *http.Request {
 					r := httptest.NewRequest(http.MethodGet, "/getWords", nil)
@@ -56,9 +69,16 @@ func (s *wordHandler_Suite) Test_wordHandler_userWords() {
 					return r.WithContext(ctx)
 				}(),
 			},
-			Want: `{"path":"/getWords","status":200,"message":"success","user_words":{"words":{}}}`,
-			setupMock: func() {
-				s.srv.On("UserWords", mock.Anything, mock.Anything).Once().Return(
+			wantRes: httpResponse{
+				Path:    "/getWords",
+				Status:  http.StatusOK,
+				Message: http.StatusText(http.StatusOK),
+				UserWords: &entity.UserWords{
+					Words: make(map[entity.CollectionName][]entity.WordData),
+				},
+			},
+			setupMock: func(args args) {
+				srvMock.On("UserWords", args.r.Context(), mock.Anything).Once().Return(
 					&entity.UserWords{
 						Words: make(map[entity.CollectionName][]entity.WordData),
 					}, nil,
@@ -67,12 +87,18 @@ func (s *wordHandler_Suite) Test_wordHandler_userWords() {
 		},
 	}
 
-	for _, tc := range tests {
-		s.Run(tc.Name, func() {
-			tc.setupMock()
-			s.h.userWords(tc.Args.w, tc.Args.r)
-			s.Assert().JSONEq(tc.Want, tc.Args.w.Body.String(),
-				"Json response must be as expected")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setupMock(tt.args)
+			h.userWords(tt.args.w, tt.args.r)
+			var gotResponse httpResponse
+			err := json.Unmarshal(tt.args.w.Body.Bytes(), &gotResponse)
+			if err != nil {
+				t.Fatalf("%v - json.Unmarshal: %v", tt.name, err)
+			}
+			if diff := cmp.Diff(tt.wantRes, gotResponse); diff != "" {
+				t.Fatalf("wanted: %v got: %v dif: %v", tt.wantRes, gotResponse, diff)
+			}
 		})
 	}
 }

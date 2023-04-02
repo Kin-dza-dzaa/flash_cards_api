@@ -6,58 +6,51 @@ import (
 	"github.com/Kin-dza-dzaa/flash_cards_api/config"
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
 	googletransclient "github.com/Kin-dza-dzaa/flash_cards_api/pkg/google_trans_client"
-	"github.com/stretchr/testify/suite"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-type GoogleAdapterTestSuite struct {
-	suite.Suite
-	tr *GoogleTranslate
-}
-
-func (s *GoogleAdapterTestSuite) SetupSuite() {
+func setupGoogleTrans(t *testing.T) *GoogleTranslate {
 	cfg, err := config.ReadConfig()
 	if err != nil {
-		s.FailNow(err.Error())
+		t.Fatalf("setupGoogleTrans - config.ReadConfig: %v", err)
 	}
 
 	gc, err := googletransclient.New(cfg.GoogleApi.URL)
 	if err != nil {
-		s.FailNow(err.Error())
+		t.Fatalf("setupGoogleTrans - googletransclient.New: %v", err)
 	}
 
-	s.tr = New(gc, cfg.GoogleApi.DefaultSrcLang, cfg.GoogleApi.DefaultTrgtLang)
+	return New(gc, cfg.GoogleApi.DefaultSrcLang, cfg.GoogleApi.DefaultTrgtLang)
 }
 
 // Test makes real calls to google translate api
-func (s *GoogleAdapterTestSuite) TestTranslate() {
-	testCases := []struct {
-		Name string
-		Word string
-		Err  error
+func Test_Translate(t *testing.T) {
+	googletrans := setupGoogleTrans(t)
+
+	tests := []struct {
+		name    string
+		word    string
+		wantErr error
 	}{
 		{
-			Name: "Check unsupported word",
-			Word: "bad_word!!!!!@#!@$#!%#",
-			Err:  entity.ErrWordNotSupported,
+			name:    "Unsupported word",
+			word:    "bad_word!!!!!@#!@$#!%#",
+			wantErr: entity.ErrWordNotSupported,
 		},
 		{
-			Name: "Check valid word",
-			Word: "lead",
-			Err:  nil,
+			name:    "Supported word",
+			word:    "lead",
+			wantErr: nil,
 		},
 	}
 
-	for _, tc := range testCases {
-		s.Run(tc.Name, func() {
-			wordTrans, err := s.tr.Translate(tc.Word)
-			s.Assert().Equal(tc.Err, err, "Errors must be equal")
-			if tc.Err == nil {
-				s.Assert().NotEmpty(wordTrans, "Word translation must be not empty")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, gotErr := googletrans.Translate(tt.word)
+			if !cmp.Equal(gotErr, tt.wantErr, cmpopts.EquateErrors()) {
+				t.Fatalf("wanted: %v but got: %v", tt.wantErr, gotErr)
 			}
 		})
 	}
-}
-
-func TestStartGoogleAdapterTestSuite(t *testing.T) {
-	suite.Run(t, new(GoogleAdapterTestSuite))
 }

@@ -45,7 +45,7 @@ func Run(cfg config.Cfg) {
 	// Register routes
 	c := chi.NewRouter()
 	wordhadnler.Register(c, s, l, cfg.HTTP.RateLimit, cfg.HTTP.RateWindow,
-		cfg.HTTP.AllowedOrigins, cfg.HTTP.AllowedHeaders)
+		cfg.HTTP.AllowedOrigins, cfg.HTTP.AllowedHeaders, cfg.HTTP.DefaultCorsDuration)
 
 	// Configure server
 	srv := http.Server{

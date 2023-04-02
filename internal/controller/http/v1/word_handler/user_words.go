@@ -41,7 +41,7 @@ func (h *wordHandler) userWords(w http.ResponseWriter, r *http.Request) {
 		httpResponse{
 			Path:      r.URL.Path,
 			Status:    http.StatusOK,
-			Message:   "success",
+			Message: http.StatusText(http.StatusOK),
 			UserWords: words,
 		},
 	)

@@ -1,76 +1,72 @@
 package wordrepository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
-	"github.com/stretchr/testify/suite"
+	"github.com/google/go-cmp/cmp"
 )
 
-// Sute for testing IsWordInColl method, embeds PostgresTestBase suite.
-type IsWordInColl_Suite struct {
-	WordRepository_Base_Suite
-	tcs []struct {
-		Name    string
-		Coll    entity.Collection
-		Want    bool
-		WantErr bool
+func setupIsWordInCollection(ctx context.Context, coll entity.Collection, t *testing.T) *WordRepository {
+	wordRepo := setupWordRepoContainer(ctx, t)
+
+	if err := wordRepo.AddTranslation(ctx, entity.WordTrans{Word: coll.Word}); err != nil {
+		t.Fatalf("setupIsWordInCollection - wordRepo.AddTranslation: %v", err)
 	}
+	if err := wordRepo.AddWord(ctx, coll); err != nil {
+		t.Fatalf("setupIsWordInCollection - wordRepo.AddWord: %v", err)
+	}
+
+	return wordRepo
 }
 
-// Sets test case data and adds words to collection if needed.
-func (s *IsWordInColl_Suite) SetupTest() {
-	s.tcs = []struct {
-		Name    string
-		Coll    entity.Collection
-		Want    bool
-		WantErr bool
+func Test_IsWordInCollection(t *testing.T) {
+	ctx := context.Background()
+	existingWord := entity.Collection{
+		Word:   "some_word",
+		Name:   "test_coll",
+		UserID: "12345",
+	}
+	wordRepo := setupIsWordInCollection(ctx, existingWord, t)
+
+	type args struct {
+		coll entity.Collection
+		ctx  context.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
 	}{
 		{
-			Name:    "Not existing word",
-			Coll:    entity.Collection{},
-			Want:    false,
-			WantErr: false,
+			name: "Not existing word",
+			args: args{
+				ctx: ctx,
+			},
 		},
 		{
-			Name: "Existing word",
-			Coll: entity.Collection{
-				Word:   "some_word",
-				Name:   "test_coll",
-				UserID: "12345",
+			name: "Existing word",
+			args: args{
+				coll: existingWord,
+				ctx:  ctx,
 			},
-			Want:    true,
-			WantErr: false,
+			want: true,
 		},
 	}
-
-	for _, tc := range s.tcs {
-		if tc.Want {
-			if err := s.pg.AddTranslation(s.ctx,
-				entity.WordTrans{Word: tc.Coll.Word}); err != nil {
-				s.FailNow(err.Error())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := wordRepo.IsWordInCollection(tt.args.ctx, tt.args.coll)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
 			}
-			if err := s.pg.AddWord(s.ctx, tc.Coll); err != nil {
-				s.FailNow(err.Error())
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
 			}
-		}
-	}
-}
-
-func (s *IsWordInColl_Suite) Test_GetUserWords() {
-	for _, tc := range s.tcs {
-		s.Run(tc.Name, func() {
-			res, err := s.pg.IsWordInCollection(s.ctx, tc.Coll)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nil")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+			if !cmp.Equal(got, tt.want) {
+				t.Fatalf("want %v but got: %v", tt.want, got)
 			}
-			s.Assert().Equal(tc.Want, res, "Bool result must be as expected")
 		})
 	}
-}
-
-func Test_IsWordInColl_Suite(t *testing.T) {
-	suite.Run(t, new(IsWordInColl_Suite))
 }

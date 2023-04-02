@@ -5,7 +5,7 @@ cover:
 	go tool cover -html cover.out
 
 test:
-	go test ./...
+	go test ./... -v
 
 build:
 	go build -o bin/ cmd/app/main.go

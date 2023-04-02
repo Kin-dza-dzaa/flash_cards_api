@@ -1,35 +1,47 @@
 package wordhadnler
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
-func (s *wordHandler_Suite) Test_wordHandler_jwtAuthenticator() {
+func Test_jwtAuthenticator(t *testing.T) {
+	h, _ := setupWordHandler(t)
 	dmyHand := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
 	type args struct {
 		w *httptest.ResponseRecorder
 		r *http.Request
 	}
-
 	tests := []struct {
-		Name string
-		Args args
-		Want string
+		name    string
+		args    args
+		wantRes httpResponse
 	}{
 		{
-			Name: "Without jwt in header",
-			Want: `{"message":"Unauthorized", "path":"/jwt", "status":401}`,
-			Args: args{
+			name: "Without jwt in header",
+			wantRes: httpResponse{
+				Path:    "/jwt",
+				Status:  http.StatusUnauthorized,
+				Message: http.StatusText(http.StatusUnauthorized),
+			},
+			args: args{
 				w: httptest.NewRecorder(),
 				r: httptest.NewRequest(http.MethodGet, "/jwt", nil),
 			},
 		},
 		{
-			Name: "With invalid jwt in header",
-			Want: `{"message":"Unauthorized", "path":"/jwt", "status":401}`,
-			Args: args{
+			name: "With invalid jwt in header",
+			wantRes: httpResponse{
+				Path:    "/jwt",
+				Status:  http.StatusUnauthorized,
+				Message: http.StatusText(http.StatusUnauthorized),
+			},
+			args: args{
 				w: httptest.NewRecorder(),
 				r: func() *http.Request {
 					r := httptest.NewRequest(http.MethodGet, "/jwt", nil)
@@ -40,8 +52,15 @@ func (s *wordHandler_Suite) Test_wordHandler_jwtAuthenticator() {
 		},
 	}
 
-	for _, tc := range tests {
-		s.h.jwtAuthenticator(dmyHand).ServeHTTP(tc.Args.w, tc.Args.r)
-		s.Assert().JSONEq(tc.Want, tc.Args.w.Body.String(), "Json response must be as expected")
+	for _, tt := range tests {
+		h.jwtAuthenticator(dmyHand).ServeHTTP(tt.args.w, tt.args.r)
+		var gotResponse httpResponse
+		err := json.Unmarshal(tt.args.w.Body.Bytes(), &gotResponse)
+		if err != nil {
+			t.Fatalf("%v - json.Unmarshal: %v", tt.name, err)
+		}
+		if diff := cmp.Diff(tt.wantRes, gotResponse); diff != "" {
+			t.Fatalf("wanted: %v got: %v dif: %v", tt.wantRes, gotResponse, diff)
+		}
 	}
 }

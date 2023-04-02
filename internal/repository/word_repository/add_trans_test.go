@@ -1,57 +1,53 @@
 package wordrepository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
-	"github.com/stretchr/testify/suite"
 )
 
-// Sute for testing AddTrans method, embeds PostgresTestBase suite.
-type AddTrans_Suite struct {
-	WordRepository_Base_Suite
-	tcs []struct {
-		Name      string
-		WordTrans entity.WordTrans
-		WantErr   bool
-	}
-}
+func Test_AddTrans(t *testing.T) {
+	ctx := context.Background()
+	wordRepo := setupWordRepoContainer(ctx, t)
 
-// Sets test case data.
-func (s *AddTrans_Suite) SetupTest() {
-	s.tcs = []struct {
-		Name      string
-		WordTrans entity.WordTrans
-		WantErr   bool
+	type args struct {
+		wordTrans entity.WordTrans
+		ctx       context.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
-			Name: "Add normal word",
-			WordTrans: entity.WordTrans{
-				Word: "test_word",
+			name: "Add normal word",
+			args: args{
+				wordTrans: entity.WordTrans{
+					Word: "test_word",
+				},
+				ctx: ctx,
 			},
-			WantErr: false,
+			wantErr: false,
 		},
 		{
-			Name:      "Add empty word",
-			WordTrans: entity.WordTrans{},
-			WantErr:   true,
+			name: "Add empty word",
+			args: args{
+				ctx: ctx,
+			},
+			wantErr: true,
 		},
 	}
-}
 
-func (s *AddTrans_Suite) Test_AddTrans() {
-	for _, tc := range s.tcs {
-		s.Run(tc.Name, func() {
-			err := s.pg.AddTranslation(s.ctx, tc.WordTrans)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nil")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := wordRepo.AddTranslation(tt.args.ctx, tt.args.wordTrans)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
 			}
 		})
 	}
-}
-
-func Test_AddTrans_Suite(t *testing.T) {
-	suite.Run(t, new(AddTrans_Suite))
 }

@@ -2,90 +2,122 @@ package wordhadnler
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
+	"github.com/google/go-cmp/cmp"
 )
 
-func (s *wordHandler_Suite) Test_wordHandler_decodeCollection() {
+func Test_decodeCollection(t *testing.T) {
+	h, _ := setupWordHandler(t)
+
+	type args struct {
+		r *http.Request
+	}
 	tests := []struct {
-		Want    entity.Collection
-		Req     *http.Request
-		Name    string
-		WantErr bool
+		wantColl entity.Collection
+		name     string
+		wantErr  bool
+		args     args
 	}{
 		{
-			Name: "Valid json",
-			Req: httptest.NewRequest(http.MethodGet, "/decode",
-				bytes.NewReader(
-					[]byte(
-						`
+			name: "Valid json",
+			wantColl: entity.Collection{
+				Word: "some_word",
+				Name: "some_coll",
+			},
+			args: args{
+				r: httptest.NewRequest(http.MethodGet, "/decode",
+					bytes.NewReader(
+						[]byte(
+							`
 							{
 								"word": "some_word",
 								"collection_name": "some_coll"
 							}
-						`,
+							`,
+						),
 					),
-				)),
-			WantErr: false,
-			Want: entity.Collection{
-				Word: "some_word",
-				Name: "some_coll",
+				),
 			},
 		},
 		{
-			Name: "Invalid json",
-			Req: httptest.NewRequest(http.MethodGet, "/decode",
-				bytes.NewReader(
-					[]byte(
-						`
+			name: "Invalid json",
+			args: args{
+				r: httptest.NewRequest(http.MethodGet, "/decode",
+					bytes.NewReader(
+						[]byte(
+							`
 							{
 								"word": "some_word,
 								"col!@#!#@
 							}
 						`,
-					),
-				)),
-			WantErr: true,
-			Want:    entity.Collection{},
+						),
+					)),
+			},
+			wantErr: true,
 		},
 	}
-	for _, tc := range tests {
-		s.Run(tc.Name, func() {
-			coll, err := s.h.decodeCollection(tc.Req)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nill")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotColl, err := h.decodeCollection(tt.args.r)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
 			}
-			s.Assert().Equal(tc.Want, coll, "Collcetions must be equal")
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
+			}
+			if diff := cmp.Diff(gotColl, tt.wantColl); diff != "" {
+				t.Fatalf("wanted: %v but got: %v diff: %v", tt.wantColl, gotColl, diff)
+			}
 		})
 	}
 }
 
-func (s *wordHandler_Suite) Test_wordHandler_encodeResopnse() {
+func Test_encodeResopnse(t *testing.T) {
+	h, _ := setupWordHandler(t)
+
+	type args struct {
+		w        *httptest.ResponseRecorder
+		response httpResponse
+	}
 	tests := []struct {
-		ResRec      *httptest.ResponseRecorder
-		ResponsHTTP *httpResponse
-		Want        string
-		Name        string
+		wantRes httpResponse
+		name    string
+		args    args
 	}{
 		{
-			Name:   "Valid response",
-			ResRec: httptest.NewRecorder(),
-			ResponsHTTP: &httpResponse{
+			name: "Valid response",
+			args: args{
+				w: httptest.NewRecorder(),
+				response: httpResponse{
+					Path:    "/some_path",
+					Status:  200,
+					Message: "test",
+				},
+			},
+			wantRes: httpResponse{
 				Path:    "/some_path",
 				Status:  200,
 				Message: "test",
 			},
-			Want: `{"message":"test", "path":"/some_path", "status":200}`,
 		},
 	}
-	for _, tc := range tests {
-		s.Run(tc.Name, func() {
-			s.h.encodeResponse(tc.ResRec, *tc.ResponsHTTP)
-			s.Assert().JSONEq(tc.Want, tc.ResRec.Body.String(), "Json responses must be equal")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h.encodeResponse(tt.args.w, tt.args.response)
+			var gotResponse httpResponse
+			err := json.Unmarshal(tt.args.w.Body.Bytes(), &gotResponse)
+			if err != nil {
+				t.Fatalf("%v - json.Unmarshal: %v", tt.name, err)
+			}
+			if diff := cmp.Diff(tt.wantRes, gotResponse); diff != "" {
+				t.Fatalf("wanted: %v got: %v dif: %v", tt.wantRes, gotResponse, diff)
+			}
 		})
 	}
 }

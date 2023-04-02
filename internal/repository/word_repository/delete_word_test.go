@@ -1,59 +1,54 @@
 package wordrepository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
-	"github.com/stretchr/testify/suite"
 )
 
-// Sute for testing DeleteWordFromColl method, embeds PostgresTestBase suite.
-type DeleteWord_Suite struct {
-	WordRepository_Base_Suite
-	tcs []struct {
-		Name    string
-		Coll    entity.Collection
-		WantErr bool
-	}
-}
+func Test_DeleteWord(t *testing.T) {
+	ctx := context.Background()
+	wordRepo := setupWordRepoContainer(ctx, t)
 
-// Sets test case data.
-func (s *DeleteWord_Suite) SetupTest() {
-	s.tcs = []struct {
-		Name    string
-		Coll    entity.Collection
-		WantErr bool
+	type args struct {
+		ctx  context.Context
+		coll entity.Collection
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
-			Name: "Delete word",
-			Coll: entity.Collection{
-				Name:   "test_coll",
-				Word:   "test_word",
-				UserID: "12345",
+			name: "Delete word",
+			args: args{
+				coll: entity.Collection{
+					Name:   "test_coll",
+					Word:   "test_word",
+					UserID: "12345",
+				},
+				ctx: ctx,
 			},
-			WantErr: false,
+			wantErr: false,
 		},
 		{
-			Name:    "Delete not existing word",
-			Coll:    entity.Collection{},
-			WantErr: false,
+			name: "Delete not existing word",
+			args: args{
+				ctx: ctx,
+			},
 		},
 	}
-}
 
-func (s *DeleteWord_Suite) Test_DeleteWord() {
-	for _, tc := range s.tcs {
-		s.Run(tc.Name, func() {
-			err := s.pg.DeleteWord(s.ctx, tc.Coll)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nil")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := wordRepo.DeleteWord(tt.args.ctx, tt.args.coll)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
 			}
 		})
 	}
-}
-
-func Test_DeleteWordFromColl_Suite(t *testing.T) {
-	suite.Run(t, new(DeleteWord_Suite))
 }

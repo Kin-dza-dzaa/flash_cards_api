@@ -1,72 +1,69 @@
 package wordrepository
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
-	"github.com/stretchr/testify/suite"
 )
 
-// Sute for testing AddWordToCollection method, embeds PostgresTestBase suite.
-type AddWord_Suite struct {
-	WordRepository_Base_Suite
-	tcs []struct {
-		Name    string
-		Coll    entity.Collection
-		WantErr bool
+func setupAddWord(ctx context.Context, coll entity.Collection, t *testing.T) *WordRepository {
+	wordRepo := setupWordRepoContainer(ctx, t)
+
+	if err := wordRepo.AddTranslation(ctx, entity.WordTrans{Word: coll.Word}); err != nil {
+		t.Fatalf("setupAddWord - wordRepo.AddTranslation: %v", err)
 	}
+
+	return wordRepo
 }
 
-// Sets test case data and adds translation to db if necessary.
-func (s *AddWord_Suite) SetupTest() {
-	s.tcs = []struct {
-		Name    string
-		Coll    entity.Collection
-		WantErr bool
+func Test_AddWord(t *testing.T) {
+	ctx := context.Background()
+	existingWord := entity.Collection{
+		Name:   "test_coll",
+		Word:   "test_word",
+		UserID: "12345",
+	}
+	wordRepo := setupAddWord(ctx, existingWord, t)
+
+	type args struct {
+		coll entity.Collection
+		ctx  context.Context
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
-			Name: "Add existing word",
-			Coll: entity.Collection{
-				Name:   "test_coll",
-				Word:   "test_word",
-				UserID: "12345",
+			name: "Add existing word",
+			args: args{
+				coll: existingWord,
+				ctx:  ctx,
 			},
-			WantErr: false,
 		},
 		{
-			Name: "Add not existing word",
-			Coll: entity.Collection{
-				Name:   "test_coll",
-				Word:   "not_exist",
-				UserID: "12345",
+			name: "Add not existing word",
+			args: args{
+				coll: entity.Collection{
+					Name:   "test_coll",
+					Word:   "not_exist",
+					UserID: "12345",
+				},
+				ctx: ctx,
 			},
-			WantErr: true,
+			wantErr: true,
 		},
 	}
-
-	for _, tc := range s.tcs {
-		if !tc.WantErr {
-			if err := s.pg.AddTranslation(s.ctx,
-				entity.WordTrans{Word: tc.Coll.Word}); err != nil {
-				s.FailNow(err.Error())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := wordRepo.AddWord(tt.args.ctx, tt.args.coll)
+			if tt.wantErr && err == nil {
+				t.Fatalf("want err but got: %v", err)
 			}
-		}
-	}
-}
-
-func (s *AddWord_Suite) Test_AddWord() {
-	for _, tc := range s.tcs {
-		s.Run(tc.Name, func() {
-			err := s.pg.AddWord(s.ctx, tc.Coll)
-			if tc.WantErr {
-				s.Assert().Error(err, "Err must be not nil")
-			} else {
-				s.Assert().Nil(err, "Err must be nil")
+			if !tt.wantErr && err != nil {
+				t.Fatalf("want nil but got: %v", err)
 			}
 		})
 	}
-}
-
-func Test_AddTransToColl_Suite(t *testing.T) {
-	suite.Run(t, new(AddWord_Suite))
 }

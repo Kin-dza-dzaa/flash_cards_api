@@ -15,10 +15,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const (
-	defualtCorsDuration = 5
-)
-
 type (
 	WordService interface {
 		AddWord(ctx context.Context, collection entity.Collection) error
@@ -36,7 +32,8 @@ type (
 
 // Register func registers routes for chi.Mux router.
 func Register(c *chi.Mux, srv WordService, l logger.Interface, rateLimit int,
-	rateWindow time.Duration, allowedOrigings []string, allowedHeaders []string) {
+	rateWindow time.Duration, allowedOrigings []string, allowedHeaders []string,
+	defaultCorsDuration uint) {
 	h := &wordHandler{
 		wordService: srv,
 		logger:      l,
@@ -62,7 +59,7 @@ func Register(c *chi.Mux, srv WordService, l logger.Interface, rateLimit int,
 			},
 			AllowedHeaders:   allowedHeaders,
 			AllowCredentials: true,
-			MaxAge:           defualtCorsDuration,
+			MaxAge:           int(defaultCorsDuration),
 		},
 	))
 	c.Use(middleware.SetHeader("Content-Type", "application/json"))
