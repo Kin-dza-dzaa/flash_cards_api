@@ -24,7 +24,7 @@ func (h *wordHandler) updateLearnInterval(w http.ResponseWriter, r *http.Request
 			httpResponse{
 				Path:    r.URL.Path,
 				Status:  http.StatusBadRequest,
-				Message: wrongJsonFormat,
+				Message: wrongJSONFormat,
 			},
 		)
 		return

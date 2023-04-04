@@ -48,14 +48,14 @@ func (t *GoogleTranslate) getWord(wordTransJRes gjson.Result) string {
 	return wordTransJRes.Get(wordPath).String()
 }
 
-func (t *GoogleTranslate) getLangs(wordTransJRes gjson.Result) (srcLang string, trgtLang string) {
+func (t *GoogleTranslate) getLangs(wordTransJRes gjson.Result) (srcLang, trgtLang string) {
 	const (
 		srcLangPath  = "1.3"
 		trgtLangPath = "1.1"
 	)
 	srcLang = wordTransJRes.Get(srcLangPath).String()
 	trgtLang = wordTransJRes.Get(trgtLangPath).String()
-	return
+	return srcLang, trgtLang
 }
 
 func (t *GoogleTranslate) getMainTranslation(wordTransJRes gjson.Result) string {
@@ -165,7 +165,7 @@ func (t *GoogleTranslate) unmarshal(data []byte) entity.WordTrans {
 	return wordTrans
 }
 
-func New(client *googletransclient.TranlateClient, defaultSrcLang string, defaultTrgtLang string) *GoogleTranslate {
+func New(client *googletransclient.TranlateClient, defaultSrcLang, defaultTrgtLang string) *GoogleTranslate {
 	return &GoogleTranslate{
 		client:          client,
 		defaultSrcLang:  defaultSrcLang,

@@ -8,8 +8,8 @@ type Service struct {
 }
 
 func New(dbAdapter wordservice.WordRepository, googletransAdapter wordservice.Translator) *Service {
-	wordservice := wordservice.New(dbAdapter, googletransAdapter)
+	ws := wordservice.New(dbAdapter, googletransAdapter)
 	return &Service{
-		wordservice,
+		ws,
 	}
 }

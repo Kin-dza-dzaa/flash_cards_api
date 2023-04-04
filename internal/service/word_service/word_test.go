@@ -11,6 +11,7 @@ import (
 )
 
 func setupWordService(t *testing.T) (*wordrepomock.WordRepository, *wordrepomock.Translator) {
+	t.Helper()
 	db := wordrepomock.NewWordPostgres(t)
 	tr := wordrepomock.NewTranslator(t)
 

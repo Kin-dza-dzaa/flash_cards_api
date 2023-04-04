@@ -11,20 +11,21 @@ import (
 )
 
 func setupGoogleTrans(t *testing.T) *GoogleTranslate {
+	t.Helper()
 	cfg, err := config.ReadConfig()
 	if err != nil {
 		t.Fatalf("setupGoogleTrans - config.ReadConfig: %v", err)
 	}
 
-	gc, err := googletransclient.New(cfg.GoogleApi.URL)
+	gc, err := googletransclient.New(cfg.GoogleAPI.URL)
 	if err != nil {
 		t.Fatalf("setupGoogleTrans - googletransclient.New: %v", err)
 	}
 
-	return New(gc, cfg.GoogleApi.DefaultSrcLang, cfg.GoogleApi.DefaultTrgtLang)
+	return New(gc, cfg.GoogleAPI.DefaultSrcLang, cfg.GoogleAPI.DefaultTrgtLang)
 }
 
-// Test makes real calls to google translate api
+// Test makes real calls to google translate api.
 func Test_Translate(t *testing.T) {
 	googletrans := setupGoogleTrans(t)
 

@@ -127,7 +127,7 @@ func Test_addWord(t *testing.T) {
 			setupMock: func(args args) {},
 		},
 		{
-			name: "Invalid collecton name",
+			name: "Invalid collection name",
 			args: args{
 				w: httptest.NewRecorder(),
 				r: func() *http.Request {

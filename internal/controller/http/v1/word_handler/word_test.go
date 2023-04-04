@@ -9,6 +9,7 @@ import (
 )
 
 func setupWordHandler(t *testing.T) (*wordHandler, *wordservicemock.WordService) {
+	t.Helper()
 	srvMock := wordservicemock.NewWordService(t)
 	h := &wordHandler{
 		wordService: srvMock,

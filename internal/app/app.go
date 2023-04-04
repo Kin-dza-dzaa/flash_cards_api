@@ -3,6 +3,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -25,7 +26,7 @@ func Run(cfg config.Cfg) {
 	// Adapters
 
 	// Google translate HTTP 2.0 client
-	client, err := googletransclient.New(cfg.GoogleApi.URL)
+	client, err := googletransclient.New(cfg.GoogleAPI.URL)
 	if err != nil {
 		l.Fatal(fmt.Errorf("app - Run - googletransclient.New: %w", err))
 	}
@@ -37,7 +38,7 @@ func Run(cfg config.Cfg) {
 	defer pool.Close()
 
 	// Repo
-	r := repository.New(client, pool, cfg.GoogleApi.DefaultSrcLang, cfg.GoogleApi.DefaultTrgtLang)
+	r := repository.New(client, pool, cfg.GoogleAPI.DefaultSrcLang, cfg.GoogleAPI.DefaultTrgtLang)
 
 	// Usecase/business logic
 	s := service.New(r, r)
@@ -60,14 +61,14 @@ func Run(cfg config.Cfg) {
 
 	go func() {
 		defer cancelServerCtx()
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			l.Error(fmt.Errorf("App - Run - srv.ListenAndServer: %w", err))
+		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
+			l.Error(fmt.Errorf("app - Run - srv.ListenAndServer: %w", err))
 			return
 		}
 		l.Info("Server was gracefully shutdown")
 	}()
 
-	// Gracefull shutdown
+	// Graceful shutdown
 	interrupt := make(chan os.Signal, 1)
 	defer close(interrupt)
 	signal.Notify(interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)

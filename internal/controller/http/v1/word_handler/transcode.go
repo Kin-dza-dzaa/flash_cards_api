@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	wrongJsonFormat = "wrong json format"
+	wrongJSONFormat = "wrong json format"
 )
 
 type httpResponse struct {

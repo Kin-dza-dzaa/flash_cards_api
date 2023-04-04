@@ -39,7 +39,7 @@ type (
 		Logger    Logger
 		HTTP      HTTP
 		PG        Postgres
-		GoogleApi DictionaryAPI
+		GoogleAPI DictionaryAPI
 	}
 )
 
