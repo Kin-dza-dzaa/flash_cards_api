@@ -9,7 +9,7 @@ import (
 
 func Test_AddTrans(t *testing.T) {
 	ctx := context.Background()
-	wordRepo := setupWordRepoContainer(ctx, t)
+	wordRepo := setupWordRepoContainer(t)
 
 	type args struct {
 		wordTrans entity.WordTrans

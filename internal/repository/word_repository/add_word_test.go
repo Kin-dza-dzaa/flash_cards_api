@@ -7,8 +7,9 @@ import (
 	"github.com/Kin-dza-dzaa/flash_cards_api/internal/entity"
 )
 
-func setupAddWord(ctx context.Context, coll entity.Collection, t *testing.T) *WordRepository {
-	wordRepo := setupWordRepoContainer(ctx, t)
+func setupAddWord(ctx context.Context, t *testing.T, coll entity.Collection) *WordRepository {
+	t.Helper()
+	wordRepo := setupWordRepoContainer(t)
 
 	if err := wordRepo.AddTranslation(ctx, entity.WordTrans{Word: coll.Word}); err != nil {
 		t.Fatalf("setupAddWord - wordRepo.AddTranslation: %v", err)
@@ -24,7 +25,7 @@ func Test_AddWord(t *testing.T) {
 		Word:   "test_word",
 		UserID: "12345",
 	}
-	wordRepo := setupAddWord(ctx, existingWord, t)
+	wordRepo := setupAddWord(ctx, t, existingWord)
 
 	type args struct {
 		coll entity.Collection

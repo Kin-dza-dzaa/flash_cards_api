@@ -33,7 +33,8 @@ type (
 // Register func registers routes for chi.Mux router.
 func Register(c *chi.Mux, srv WordService, l logger.Interface, rateLimit int,
 	rateWindow time.Duration, allowedOrigings []string, allowedHeaders []string,
-	defaultCorsDuration uint) {
+	defaultCorsDuration uint,
+) {
 	h := &wordHandler{
 		wordService: srv,
 		logger:      l,

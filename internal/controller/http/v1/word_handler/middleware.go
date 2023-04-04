@@ -8,7 +8,6 @@ import (
 )
 
 func (h *wordHandler) jwtAuthenticator(next http.Handler) http.Handler {
-
 	respond := func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		h.encodeResponse(w,

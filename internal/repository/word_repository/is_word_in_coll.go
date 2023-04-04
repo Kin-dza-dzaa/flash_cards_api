@@ -10,7 +10,8 @@ import (
 )
 
 func (p *WordRepository) IsWordInCollection(ctx context.Context,
-	collection entity.Collection) (bool, error) {
+	collection entity.Collection,
+) (bool, error) {
 	subQuery := p.Builder.
 		Select("*").
 		From("user_collection").

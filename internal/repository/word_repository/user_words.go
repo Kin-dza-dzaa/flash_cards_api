@@ -9,7 +9,8 @@ import (
 )
 
 func (p *WordRepository) UserWords(ctx context.Context,
-	collection entity.Collection) (*entity.UserWords, error) {
+	collection entity.Collection,
+) (*entity.UserWords, error) {
 	sql, args, err := p.Builder.Select("collection_name, time_diff, last_repeat, trans_data").
 		From("user_collection").
 		Join("word_translation USING(word)").
@@ -19,7 +20,7 @@ func (p *WordRepository) UserWords(ctx context.Context,
 		return nil, fmt.Errorf("WordRepository - UserWords - ToSql: %w", err)
 	}
 
-	var userWords = new(entity.UserWords)
+	userWords := new(entity.UserWords)
 	userWords.Words = make(map[entity.CollectionName][]entity.WordData)
 	err = p.Pool.BeginFunc(ctx, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, sql, args...)

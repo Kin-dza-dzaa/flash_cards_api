@@ -102,7 +102,8 @@ func (t *GoogleTranslate) getPOSDefs(defsJRes []gjson.Result) []entity.WordDefin
 }
 
 func (t *GoogleTranslate) getDefs(
-	wordTransJRes gjson.Result) map[entity.PartOfSpeech][]entity.WordDefinition {
+	wordTransJRes gjson.Result,
+) map[entity.PartOfSpeech][]entity.WordDefinition {
 	const (
 		defsPath = "3.1.0"
 		POSPath  = "0"
@@ -133,7 +134,8 @@ func (t *GoogleTranslate) getPOSTransltions(transJRes []gjson.Result) []string {
 }
 
 func (t *GoogleTranslate) getTranslations(
-	wordTransJRes gjson.Result) map[entity.PartOfSpeech][]string {
+	wordTransJRes gjson.Result,
+) map[entity.PartOfSpeech][]string {
 	const (
 		POSPath          = "0"
 		translationsPath = "3.5.0"

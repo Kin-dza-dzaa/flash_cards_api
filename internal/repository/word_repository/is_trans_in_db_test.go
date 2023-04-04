@@ -8,8 +8,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func setupIsTranslationInDB(ctx context.Context, coll entity.Collection, t *testing.T) *WordRepository {
-	wordRepo := setupWordRepoContainer(ctx, t)
+func setupIsTranslationInDB(ctx context.Context, t *testing.T, coll entity.Collection) *WordRepository {
+	t.Helper()
+	wordRepo := setupWordRepoContainer(t)
 
 	if err := wordRepo.AddTranslation(ctx, entity.WordTrans{Word: coll.Word}); err != nil {
 		t.Fatalf("setupIsWordInCollection - wordRepo.AddTranslation: %v", err)
@@ -25,7 +26,7 @@ func Test_IsTranslationInDB(t *testing.T) {
 		Word:   "test_word",
 		UserID: "12345",
 	}
-	wordRepo := setupIsTranslationInDB(ctx, existingColl, t)
+	wordRepo := setupIsTranslationInDB(ctx, t, existingColl)
 
 	type args struct {
 		ctx  context.Context

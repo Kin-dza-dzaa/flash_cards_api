@@ -30,7 +30,8 @@ type WordService struct {
 }
 
 func (s *WordService) DeleteWord(ctx context.Context,
-	collection entity.Collection) error {
+	collection entity.Collection,
+) error {
 	err := s.wordRepo.DeleteWord(ctx, collection)
 	if err != nil {
 		return fmt.Errorf("WordService - DeleteWord - s.wordRepo.DeleteWord: %w", err)
@@ -39,7 +40,8 @@ func (s *WordService) DeleteWord(ctx context.Context,
 }
 
 func (s *WordService) UpdateLearnInterval(ctx context.Context,
-	collection entity.Collection) error {
+	collection entity.Collection,
+) error {
 	err := s.wordRepo.UpdateLearnInterval(ctx, collection)
 	if err != nil {
 		return fmt.Errorf("WordService - UpdateLearnInterval - s.wordRepo.UpdateLearnInterval: %w", err)
@@ -48,7 +50,8 @@ func (s *WordService) UpdateLearnInterval(ctx context.Context,
 }
 
 func (s *WordService) UserWords(ctx context.Context,
-	collection entity.Collection) (*entity.UserWords, error) {
+	collection entity.Collection,
+) (*entity.UserWords, error) {
 	userWords, err := s.wordRepo.UserWords(ctx, collection)
 	if err != nil {
 		return nil, fmt.Errorf("WordService - UserWords - s.wordRepo.UserWords: %w", err)

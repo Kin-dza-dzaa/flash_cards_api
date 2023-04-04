@@ -9,7 +9,8 @@ import (
 )
 
 func (p *WordRepository) DeleteWord(ctx context.Context,
-	collection entity.Collection) error {
+	collection entity.Collection,
+) error {
 	sql, args, err := p.Builder.Delete("*").
 		From("user_collection").
 		Where("user_id = ? AND word = ? AND collection_name = ?",
