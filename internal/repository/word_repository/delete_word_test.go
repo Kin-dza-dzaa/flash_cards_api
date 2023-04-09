@@ -9,7 +9,7 @@ import (
 
 func Test_DeleteWord(t *testing.T) {
 	ctx := context.Background()
-	wordRepo := setupWordRepoContainer(t)
+	wordRepo := setupWordRepoContainer(ctx, t)
 
 	type args struct {
 		ctx  context.Context

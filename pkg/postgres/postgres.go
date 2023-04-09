@@ -18,7 +18,7 @@ func (p *ConnPool) Close() {
 	p.Pool.Close()
 }
 
-func New(pgurl string, maxPoolSize int) (*ConnPool, error) {
+func New(ctx context.Context, pgurl string, maxPoolSize int) (*ConnPool, error) {
 	poolConfig, err := pgxpool.ParseConfig(pgurl)
 	if err != nil {
 		return nil, fmt.Errorf("ConnPool - NewPool - pgxpool.ParseConfig: %w", err)
@@ -26,7 +26,7 @@ func New(pgurl string, maxPoolSize int) (*ConnPool, error) {
 
 	poolConfig.MaxConns = int32(maxPoolSize)
 
-	pool, err := pgxpool.ConnectConfig(context.Background(), poolConfig)
+	pool, err := pgxpool.ConnectConfig(ctx, poolConfig)
 	if err != nil {
 		return nil, fmt.Errorf("ConnPool - NewPool - ConnectConfig: %w", err)
 	}

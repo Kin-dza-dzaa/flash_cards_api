@@ -10,7 +10,7 @@ import (
 
 func setupIsWordInCollection(ctx context.Context, t *testing.T, coll entity.Collection) *WordRepository {
 	t.Helper()
-	wordRepo := setupWordRepoContainer(t)
+	wordRepo := setupWordRepoContainer(ctx, t)
 
 	if err := wordRepo.AddTranslation(ctx, entity.WordTrans{Word: coll.Word}); err != nil {
 		t.Fatalf("setupIsWordInCollection - wordRepo.AddTranslation: %v", err)

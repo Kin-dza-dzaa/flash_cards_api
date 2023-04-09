@@ -9,7 +9,7 @@ import (
 
 func Test_UpdateLearnInterval(t *testing.T) {
 	ctx := context.Background()
-	wordRepo := setupWordRepoContainer(t)
+	wordRepo := setupWordRepoContainer(ctx, t)
 
 	type args struct {
 		coll entity.Collection

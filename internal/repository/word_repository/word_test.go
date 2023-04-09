@@ -1,6 +1,7 @@
 package wordrepository
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -10,7 +11,7 @@ import (
 )
 
 // Creates new throw away postgres:alpine container.
-func setupWordRepoContainer(t *testing.T) *WordRepository {
+func setupWordRepoContainer(ctx context.Context, t *testing.T) *WordRepository {
 	t.Helper()
 	const (
 		container = "flash_cards_db_test"
@@ -41,7 +42,7 @@ func setupWordRepoContainer(t *testing.T) *WordRepository {
 		}
 	})
 
-	connPool, err := postgres.New(fmt.Sprintf("postgresql://%s:%s@0.0.0.0:%s/%s", user, pass, c.Port(), db), 10)
+	connPool, err := postgres.New(ctx, fmt.Sprintf("postgresql://%s:%s@0.0.0.0:%s/%s", user, pass, c.Port(), db), 10)
 	if err != nil {
 		t.Fatalf("setupWordRepo - postgres.New: %v", err)
 	}

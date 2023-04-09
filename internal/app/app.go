@@ -21,6 +21,8 @@ import (
 )
 
 func Run(cfg config.Cfg) {
+	serverCtx, cancelServerCtx := context.WithCancel(context.Background())
+
 	l := logger.New(cfg.Logger.Level)
 
 	// Adapters
@@ -31,7 +33,7 @@ func Run(cfg config.Cfg) {
 		l.Fatal(fmt.Errorf("app - Run - googletransclient.New: %w", err))
 	}
 	// Postgres pool
-	pool, err := postgres.New(cfg.PG.URL, cfg.PG.MaxPoolSize)
+	pool, err := postgres.New(serverCtx, cfg.PG.URL, cfg.PG.MaxPoolSize)
 	if err != nil {
 		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
 	}
@@ -57,8 +59,6 @@ func Run(cfg config.Cfg) {
 	}
 
 	// Server start-up
-	serverCtx, cancelServerCtx := context.WithCancel(context.Background())
-
 	go func() {
 		defer cancelServerCtx()
 		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
