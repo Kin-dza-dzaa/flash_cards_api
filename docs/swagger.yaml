@@ -1,0 +1,247 @@
+basePath: /v1
+definitions:
+  github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.UserWords:
+    properties:
+      words:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordData'
+          type: array
+        type: object
+    type: object
+  github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordData:
+    properties:
+      definitions_with_examples:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordDefinition'
+          type: array
+        type: object
+      examples:
+        items:
+          type: string
+        type: array
+      last_repeat:
+        type: string
+      main_translation:
+        type: string
+      source_language:
+        type: string
+      target_language:
+        type: string
+      time_diff:
+        $ref: '#/definitions/time.Duration'
+      transltions:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      word:
+        type: string
+    type: object
+  github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordDefinition:
+    properties:
+      definition:
+        type: string
+      example:
+        type: string
+    type: object
+  internal_controller_http_v1_rest.AddWordRequest:
+    properties:
+      collection_name:
+        type: string
+      last_repeat:
+        type: string
+      time_diff:
+        $ref: '#/definitions/time.Duration'
+      word:
+        type: string
+    required:
+    - collection_name
+    - last_repeat
+    - word
+    type: object
+  internal_controller_http_v1_rest.DeleteWordRequest:
+    properties:
+      collection_name:
+        type: string
+      word:
+        type: string
+    required:
+    - collection_name
+    - word
+    type: object
+  internal_controller_http_v1_rest.UpdateLearnIntervalRequest:
+    properties:
+      collection_name:
+        type: string
+      last_repeat:
+        type: string
+      time_diff:
+        $ref: '#/definitions/time.Duration'
+      word:
+        type: string
+    required:
+    - collection_name
+    - last_repeat
+    - time_diff
+    - word
+    type: object
+  internal_controller_http_v1_rest.httpResponse:
+    properties:
+      message:
+        type: string
+      path:
+        type: string
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+host: localhost:8000
+info:
+  contact:
+    name: API Support
+  description: REST API for word and collections of a user.
+  title: Flash cards API
+  version: 0.3.4
+paths:
+  /words:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Word and collection name
+        in: body
+        name: WordInfo
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controller_http_v1_rest.DeleteWordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Word was deleted
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "400":
+          description: Wrong JSON format
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+      summary: Deletes given word from a collection.
+      tags:
+      - words
+    get:
+      description: Gets user words that put together in collections.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User words
+          schema:
+            $ref: '#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.UserWords'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+      summary: Get user words.
+      tags:
+      - words
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Word, collection name with learn intervals
+        in: body
+        name: WordInfo
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controller_http_v1_rest.AddWordRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Word was added to collection
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "400":
+          description: Wrong JSON format
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "403":
+          description: Word not supported
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+      summary: Adds a word to a given collection.
+      tags:
+      - words
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Word, collection name with learn intervals
+        in: body
+        name: WordInfo
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controller_http_v1_rest.UpdateLearnIntervalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Interval was updated
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "400":
+          description: Wrong JSON format
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/internal_controller_http_v1_rest.httpResponse'
+      summary: Updates learn interval for a given word.
+      tags:
+      - words
+swagger: "2.0"

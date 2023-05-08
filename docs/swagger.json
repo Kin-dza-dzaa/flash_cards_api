@@ -1,0 +1,368 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "REST API for word and collections of a user.",
+        "title": "Flash cards API",
+        "contact": {
+            "name": "API Support"
+        },
+        "version": "0.3.4"
+    },
+    "host": "localhost:8000",
+    "basePath": "/v1",
+    "paths": {
+        "/words": {
+            "get": {
+                "description": "Gets user words that put together in collections.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "words"
+                ],
+                "summary": "Get user words.",
+                "responses": {
+                    "200": {
+                        "description": "User words",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.UserWords"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "words"
+                ],
+                "summary": "Updates learn interval for a given word.",
+                "parameters": [
+                    {
+                        "description": "Word, collection name with learn intervals",
+                        "name": "WordInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.UpdateLearnIntervalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Interval was updated",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Wrong JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "words"
+                ],
+                "summary": "Adds a word to a given collection.",
+                "parameters": [
+                    {
+                        "description": "Word, collection name with learn intervals",
+                        "name": "WordInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.AddWordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Word was added to collection",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Wrong JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Word not supported",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "words"
+                ],
+                "summary": "Deletes given word from a collection.",
+                "parameters": [
+                    {
+                        "description": "Word and collection name",
+                        "name": "WordInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.DeleteWordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Word was deleted",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Wrong JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_controller_http_v1_rest.httpResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.UserWords": {
+            "type": "object",
+            "properties": {
+                "words": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordData"
+                        }
+                    }
+                }
+            }
+        },
+        "github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordData": {
+            "type": "object",
+            "properties": {
+                "definitions_with_examples": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordDefinition"
+                        }
+                    }
+                },
+                "examples": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "last_repeat": {
+                    "type": "string"
+                },
+                "main_translation": {
+                    "type": "string"
+                },
+                "source_language": {
+                    "type": "string"
+                },
+                "target_language": {
+                    "type": "string"
+                },
+                "time_diff": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "transltions": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "word": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_Kin-dza-dzaa_flash_cards_api_internal_entity.WordDefinition": {
+            "type": "object",
+            "properties": {
+                "definition": {
+                    "type": "string"
+                },
+                "example": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_controller_http_v1_rest.AddWordRequest": {
+            "type": "object",
+            "required": [
+                "collection_name",
+                "last_repeat",
+                "word"
+            ],
+            "properties": {
+                "collection_name": {
+                    "type": "string"
+                },
+                "last_repeat": {
+                    "type": "string"
+                },
+                "time_diff": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "word": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_controller_http_v1_rest.DeleteWordRequest": {
+            "type": "object",
+            "required": [
+                "collection_name",
+                "word"
+            ],
+            "properties": {
+                "collection_name": {
+                    "type": "string"
+                },
+                "word": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_controller_http_v1_rest.UpdateLearnIntervalRequest": {
+            "type": "object",
+            "required": [
+                "collection_name",
+                "last_repeat",
+                "time_diff",
+                "word"
+            ],
+            "properties": {
+                "collection_name": {
+                    "type": "string"
+                },
+                "last_repeat": {
+                    "type": "string"
+                },
+                "time_diff": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "word": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_controller_http_v1_rest.httpResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
+        }
+    }
+}

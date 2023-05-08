@@ -1,4 +1,6 @@
-// Package entity describes business logic entity.
+// Package entity describes pure business entities and errors, used across the app.
+// All entities include JSON tags for easer use in transport/adapter layers for marshalling/unmarshalling and stroing them as BSON or JSONB.
+// Those tags are used only for storing data in DB and sending data via HTTP as JSON.
 package entity
 
 type (
