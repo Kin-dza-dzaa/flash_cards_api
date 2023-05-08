@@ -16,6 +16,7 @@ TODO list for this project:
     *    [x]  Tracing (Jaeger)
     *    [ ]  Merics (Prometheus)
 *   [x] Structured logging
+*   [x] Swagger docs
 *   [x] Google coding guidelines/ 12 factor app
 *   [x] Migrations (go-migrate)
 
